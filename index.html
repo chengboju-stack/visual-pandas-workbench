@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f4f7fb">
+<meta name="description" content="可视化 pandas 工作台：载入数据，用图形观察结构、改造数据、看见每一步结果与等价 pandas 代码。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232f7fd8'/%3E%3Cpath d='M6 10h20M13 10v16' stroke='%23fff' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<title>可视化 pandas 工作台 · Visual pandas Workbench</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="viz.css">
+</head>
+<body>
+<a class="skip" href="#main" data-t="navWorkbench">工作台</a>
+
+<header class="topbar">
+  <a class="brand" href="#top" aria-label="回到顶部">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32" width="30" height="30"><g fill="none" stroke-width="2.4" stroke-linejoin="round">
+        <rect x="3" y="4" width="26" height="24" rx="3" stroke="#2f7fd8"/>
+        <path d="M3 11h26M11 11v17" stroke="#2bb894"/>
+      </g></svg>
+    </span>
+    <span><b data-t="brand">可视化 pandas 工作台</b><small data-t="brandSub">登载数据 · 观察结构 · 改造数据 · 看见结果</small></span>
+  </a>
+  <div class="top-actions">
+    <a class="top-link" href="#about" data-t="navDocs">说明</a>
+    <button id="lang-btn" class="lang-btn" type="button" data-t="langBtn" data-t-title="langBtn">中 / EN</button>
+  </div>
+</header>
+
+<main id="main">
+  <!-- ── 数据集信息 ── -->
+  <section class="dsbar" id="top">
+    <div class="dsbar-main">
+      <span class="ds-tag" data-t="dataLoaded">已载入</span>
+      <b id="ds-name" data-t="dataDefault">默认示例数据</b>
+      <span class="ds-shape" id="ds-shape">—</span>
+      <span class="ds-null-wrap"><span class="ds-null-label" data-t="cellNull">空值</span><i id="ds-null">0</i></span>
+      <button id="data-toggle" class="btn btn-ghost" type="button" aria-expanded="false" data-t="dataPanel" data-t-title="dataPanel">数据</button>
+    </div>
+    <p class="ds-note" id="ds-note" data-t="dataDefaultNote"></p>
+
+    <div class="data-box" id="data-box" hidden>
+      <div class="data-col">
+        <p class="muted" data-t="dataPasteHint">把表格粘贴到下面，或直接拖入文件。第一行会被当作列名。</p>
+        <textarea id="data-text" class="data-text" spellcheck="false" placeholder="date,region,users&#10;2026-01-01,East,120&#10;..."></textarea>
+        <div class="data-actions">
+          <button id="btn-load" class="btn btn-primary" type="button" data-t="dataApply">载入数据</button>
+          <button id="btn-file" class="btn" type="button" data-t="dataUpload">选择文件</button>
+          <input id="file-input" type="file" accept=".csv,.tsv,.txt" hidden>
+          <button id="btn-reset" class="btn btn-ghost" type="button" data-t="dataReset">恢复示例数据</button>
+        </div>
+        <p id="data-error" class="data-error" hidden></p>
+      </div>
+      <div class="data-drop" id="data-drop">
+        <span class="drop-icon" aria-hidden="true">⇩</span>
+        <span data-t="dataUpload">选择文件</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 主工作区 ── -->
+  <div class="workbench">
+    <!-- 侧栏：操作 -->
+    <aside class="sidebar">
+      <h2 class="side-title" data-t="navOps">操作</h2>
+      <div id="ops-host" class="ops-host"></div>
+      <div id="op-form" class="op-form"></div>
+    </aside>
+
+    <!-- 内容区 -->
+    <section class="content" id="result-anchor">
+      <div class="pipeline-bar">
+        <h2 class="side-title" data-t="pipeline">操作流水线</h2>
+        <div id="pipeline-host" class="pipeline"></div>
+      </div>
+
+      <div class="result-head">
+        <div class="result-meta">
+          <b id="result-shape">—</b>
+          <span class="dot">·</span>
+          <span id="result-mem">—</span>
+          <span class="dot">·</span>
+          <span class="null-inline" id="result-null"></span>
+        </div>
+        <div class="tabs" role="tablist">
+          <button class="tab-btn" role="tab" data-view="charts" aria-selected="true" data-t="viewCharts">图表</button>
+          <button class="tab-btn" role="tab" data-view="table" aria-selected="false" data-t="viewTable">数据表</button>
+          <button class="tab-btn" role="tab" data-view="code" aria-selected="false" data-t="viewCode">代码</button>
+        </div>
+      </div>
+
+      <div class="dtype-strip" id="result-dtypes"></div>
+
+      <div class="view" id="view-charts">
+        <div class="charts-grid" id="charts-host"></div>
+      </div>
+
+      <div class="view" id="view-table" hidden>
+        <div class="table-tools">
+          <input id="search-input" class="search" type="search" data-t-title="searchRows" placeholder="在结果中搜索…">
+        </div>
+        <div id="table-host"></div>
+      </div>
+
+      <div class="view" id="view-code" hidden>
+        <div class="code-head">
+          <h3 data-t="fullChain">完整链路（可直接在 Jupyter 中运行）</h3>
+          <button id="copy-btn" class="btn btn-ghost" type="button" data-t="copyCode">复制代码</button>
+        </div>
+        <pre class="code-block"><code id="code-host"></code></pre>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── 说明 ── -->
+  <section class="about" id="about">
+    <div class="about-col">
+      <h2 data-t="aboutTitle">这个网站做什么</h2>
+      <p data-t="aboutBody"></p>
+      <ul id="about-points" class="about-list"></ul>
+    </div>
+    <div class="about-col">
+      <h2 data-t="limitsTitle">边界与说明</h2>
+      <ul id="limit-list" class="about-list limit"></ul>
+      <p class="muted" data-t="sampleNote"></p>
+      <p class="muted" data-t="footer"></p>
+    </div>
+  </section>
+</main>
+
+<script src="df.js"></script>
+<script src="data.js"></script>
+<script src="charts.js"></script>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

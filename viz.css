@@ -1,0 +1,186 @@
+/* ==========================================================================
+   viz.css · 图形样式与动效（深色主题）
+   ========================================================================== */
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(368px, 1fr));
+  gap: 14px;
+  /* dense：让单列卡片回填宽图旁边的空位；start：卡片按内容高度收边，不被同排高个邻居拉出大片空白 */
+  grid-auto-flow: dense;
+  align-items: start;
+}
+.chart-card {
+  position: relative;
+  background: linear-gradient(150deg, rgba(18, 32, 44, .92), rgba(11, 20, 28, .92));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+  padding: 12px 14px 14px;
+  min-width: 0;
+  transition: box-shadow .22s, border-color .22s, transform .22s;
+  animation: cardIn .42s cubic-bezier(.2, .8, .2, 1) both;
+}
+.chart-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: var(--radius); pointer-events: none;
+  background: linear-gradient(120deg, rgba(56, 189, 248, .07), transparent 42%);
+  opacity: 0; transition: opacity .25s;
+}
+.chart-card:hover { border-color: var(--line-strong); box-shadow: var(--shadow-2), var(--glow-cyan); transform: translateY(-2px); }
+.chart-card:hover::before { opacity: 1; }
+.chart-card.chart-wide { grid-column: span 2; }
+/* 内容高度不由邻居决定：避免卡片底部出现一大块空白 */
+.chart-card.card-fit { align-self: start; }
+.chart-card:nth-child(1) { animation-delay: .02s; }
+.chart-card:nth-child(2) { animation-delay: .07s; }
+.chart-card:nth-child(3) { animation-delay: .12s; }
+.chart-card:nth-child(4) { animation-delay: .17s; }
+.chart-card:nth-child(5) { animation-delay: .22s; }
+.chart-card:nth-child(6) { animation-delay: .27s; }
+.chart-card:nth-child(7) { animation-delay: .32s; }
+.chart-card:nth-child(8) { animation-delay: .37s; }
+@keyframes cardIn { from { opacity: 0; transform: translateY(14px) scale(.99); } to { opacity: 1; transform: none; } }
+@media (max-width: 900px) { .chart-card.chart-wide { grid-column: span 1; } }
+
+.viz { display: grid; gap: 9px; min-width: 0; }
+.viz-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.viz-title { font-size: 13.5px; font-weight: 650; color: var(--ink); }
+.viz-sub { font: 11px ui-monospace, Consolas, monospace; color: var(--muted-2); }
+.viz-body { position: relative; min-width: 0; }
+.viz-svg { width: 100%; height: auto; display: block; overflow: visible; margin-inline: auto; }
+.viz-empty { margin: 0; padding: 18px 0; font-size: 12.5px; color: var(--muted); text-align: center; }
+
+/* 轴与文字 */
+.viz-grid { stroke: var(--viz-grid); stroke-width: 1; shape-rendering: crispEdges; }
+.viz-tick { fill: var(--viz-axis); font: 10.5px ui-monospace, Consolas, monospace; }
+.viz-tick.viz-cat { font-family: inherit; font-size: 11px; fill: var(--ink-2); }
+.viz-tick.viz-dim { fill: var(--muted-2); font-size: 9.5px; }
+.viz-axis-name { fill: var(--ink-2); font-size: 11.5px; }
+.viz-val { fill: var(--ink); font: 650 11px ui-monospace, Consolas, monospace; }
+
+/* 柱 / 点 / 线 / 面 */
+.viz-bar { transition: opacity .18s, filter .18s; }
+.viz-bar:hover { filter: brightness(1.24) saturate(1.1); }
+.viz-dot { transition: r .16s, fill-opacity .16s, filter .16s; }
+.viz-dot:hover { r: 5.6; fill-opacity: 1; filter: drop-shadow(0 0 8px rgba(56, 189, 248, .9)); }
+.viz-line { fill: none; filter: drop-shadow(0 2px 8px rgba(0, 0, 0, .5)); }
+.viz-area { stroke: none; }
+.viz-whisker { opacity: .85; }
+.viz-box { transition: fill-opacity .18s, filter .18s; }
+.viz-box:hover { fill-opacity: .55; filter: brightness(1.15); }
+
+/* 热力图 */
+.viz-cell { transition: opacity .16s, filter .16s; }
+.viz-cell:hover { opacity: .8; filter: brightness(1.25); }
+.viz-celltext { font: 10px ui-monospace, Consolas, monospace; pointer-events: none; }
+.viz-celltext[data-lum="bright"] { fill: #04121a; }
+.viz-celltext[data-lum="dim"] { fill: #eaf6fb; }
+.viz-scalebar { display: flex; align-items: center; gap: 8px; font: 10.5px ui-monospace, Consolas, monospace; color: var(--muted-2); }
+.viz-scalebar i { display: block; flex: 1; height: 8px; border-radius: 999px; border: 1px solid var(--line); }
+.viz-scale-note { color: var(--amber); border: 1px solid rgba(251, 191, 36, .35); background: rgba(251, 191, 36, .08); border-radius: 999px; padding: 1px 8px; flex: none; }
+
+/* 环形图 */
+.viz-arc { transition: opacity .18s, filter .18s; cursor: default; }
+.viz-arc:hover { opacity: .92; filter: brightness(1.18) drop-shadow(0 0 10px rgba(56, 189, 248, .7)); }
+.viz-arc-label { fill: #04121a; font: 650 11px ui-monospace, Consolas, monospace; pointer-events: none; }
+.viz-donut-main { fill: var(--ink); font: 650 22px ui-monospace, Consolas, monospace; }
+
+/* 矩形树 / 雷达 / 韦恩 */
+.viz-tile { transition: opacity .18s, filter .18s; }
+.viz-tile:hover { opacity: 1; filter: brightness(1.2); }
+.viz-tile-label { fill: #04121a; font: 650 11.5px inherit; pointer-events: none; }
+.viz-tile-value { fill: rgba(4, 18, 26, .78); font: 10.5px ui-monospace, Consolas, monospace; pointer-events: none; }
+.viz-radar-ring { stroke: var(--viz-grid); stroke-width: 1; }
+.viz-radar-spoke { stroke: var(--viz-grid); stroke-width: 1; }
+.viz-radar-label { fill: var(--ink-2); font-size: 11px; }
+.viz-radar-area { transition: fill-opacity .22s; filter: drop-shadow(0 0 10px rgba(56, 189, 248, .28)); }
+.viz-venn-label { fill: var(--ink-2); font-size: 11.5px; }
+.viz-venn-main { fill: var(--ink); font: 650 22px ui-monospace, Consolas, monospace; }
+
+/* 笔刷 */
+.viz-brushable { cursor: crosshair; }
+.viz-brush { fill: rgba(56, 189, 248, .16); stroke: var(--cyan); stroke-width: 1.4; stroke-dasharray: 5 4; }
+.viz-hintline { margin: 2px 0 0; font-size: 11.5px; color: var(--muted); }
+
+/* 图例 */
+.viz-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-2); }
+.viz-legend-col { flex-direction: column; gap: 6px; }
+.viz-legend-item { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; padding: 2px 0; font-size: 12px; color: inherit; text-align: left; transition: color .16s; }
+button.viz-legend-item:hover { color: var(--cyan); }
+.viz-legend-item i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.viz-legend-item b { margin-left: 4px; font: 650 11.5px ui-monospace, Consolas, monospace; color: var(--ink); }
+.viz-legend-item.off { opacity: .4; text-decoration: line-through; }
+
+/* 小倍数条 */
+.viz-strips { display: grid; gap: 6px; }
+.viz-strip-row { display: grid; grid-template-columns: 104px minmax(0, 1fr); align-items: center; gap: 10px; }
+.viz-strip-label { font: 11.5px ui-monospace, Consolas, monospace; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.viz-strip-chart svg { width: 100%; height: auto; display: block; }
+.viz-strip-cat { fill: #b6c8d6; font: 9.5px ui-monospace, Consolas, monospace; }
+.viz-strip-pct { fill: #8ba0b2; font: 9.5px ui-monospace, Consolas, monospace; }
+
+/* 合并信息条 */
+.viz-joininfo { display: flex; flex-wrap: wrap; gap: 10px 18px; font-size: 12px; color: var(--ink-2); }
+.viz-joininfo b { font-family: ui-monospace, Consolas, monospace; color: var(--cyan); }
+.viz-keys { display: inline-flex; flex-wrap: wrap; gap: 5px; }
+.viz-key { font: 11px ui-monospace, Consolas, monospace; background: var(--surface-3); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; }
+
+/* 卡片上的图形类型切换 */
+.viz-switch { display: flex; align-items: center; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
+.viz-switch-label { font-size: 11px; color: var(--muted-2); margin-right: 2px; }
+.viz-switch-btn {
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--muted);
+  border-radius: 999px; padding: 3px 10px; font-size: 11.5px;
+  transition: background .16s, border-color .16s, color .16s, transform .16s, box-shadow .16s;
+}
+.viz-switch-btn:hover { border-color: var(--cyan); color: var(--cyan); background: rgba(56, 189, 248, .1); transform: translateY(-1px); }
+.viz-switch-btn.active { background: linear-gradient(135deg, var(--cyan), #22a3d8); border-color: var(--cyan); color: #04121a; font-weight: 650; box-shadow: var(--glow-cyan); }
+.card-mount { min-width: 0; }
+
+/* 图表提示条 */
+.charts-cap {
+  margin: 0; padding: 9px 13px; font-size: 12.5px; color: #a8dcf5;
+  background: rgba(56, 189, 248, .1); border: 1px solid rgba(56, 189, 248, .3);
+  border-left: 3px solid var(--cyan); border-radius: var(--radius-sm);
+}
+
+/* 提示框 */
+.viz-tip {
+  position: fixed; z-index: 900; max-width: 300px; pointer-events: none; opacity: 0;
+  transform: translateY(4px); transition: opacity .14s ease, transform .14s ease;
+  background: rgba(6, 13, 19, .97); color: #e8f0f8; border: 1px solid var(--line-strong);
+  border-radius: 9px; padding: 9px 11px;
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, .85), 0 0 22px -8px rgba(56, 189, 248, .5);
+  font-size: 12px; line-height: 1.62;
+}
+.viz-tip.show { opacity: 1; transform: translateY(0); }
+.viz-tip b { display: block; color: #6fd6ff; font-weight: 650; margin-bottom: 2px; }
+.viz-tip i { display: block; font-style: normal; color: #b9c9d8; }
+.viz-tip .viz-hint { margin-top: 5px; padding-top: 5px; border-top: 1px solid #23384a; color: #7ff0c4; font-size: 11px; }
+
+/* ───────── 动画 ───────── */
+@keyframes viz-grow-y { from { transform: scaleY(.02); transform-origin: bottom; opacity: .3; } to { transform: scaleY(1); transform-origin: bottom; opacity: 1; } }
+@keyframes viz-pop { from { transform: scale(.2); transform-origin: center; opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes viz-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes viz-draw { to { stroke-dashoffset: 0; } }
+@keyframes viz-pulse { 0%, 100% { opacity: .92; } 50% { opacity: 1; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* 雷达/韦恩缓慢呼吸，避免画面完全静止 */
+  .viz-radar-area { animation: viz-pulse 4.6s ease-in-out infinite; }
+  .viz-radar-area:nth-of-type(2) { animation-delay: 1.1s; }
+  .viz-venn { animation: viz-pulse 5.4s ease-in-out infinite; }
+  /* 热力格错峰淡入后保持轻微高光呼吸 */
+  .viz-cell { animation: cellIn .5s ease both; }
+  @keyframes cellIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
+}
+
+@media (max-width: 640px) {
+  .charts-grid { grid-template-columns: 1fr; }
+  .viz-strip-row { grid-template-columns: 84px minmax(0, 1fr); }
+  .viz-legend { font-size: 11.5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viz-bar, .viz-dot, .viz-cell, .viz-arc, .viz-tile, .viz-radar-area { animation: none !important; }
+}
